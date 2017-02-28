@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/zetos/inv-chisquare-cdf/issues"
   },
-  "homepage": "https://github.com/zetos/inv-chisquare-cdf#readme"
+  "homepage": "https://github.com/zetos/inv-chisquare-cdf#readme",
+  "devDependencies": {
+    "eslint": "^3.16.1",
+    "eslint-config-google": "^0.7.1"
+  }
 }
