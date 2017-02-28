@@ -8,7 +8,7 @@ module.exports = {
         "mocha"
     ],
     "rules": {
-         "max-len": [1, 80, 2],
+         "max-len": [1, 90, 2],
          "mocha/no-exclusive-tests": "error",
     }
 };
