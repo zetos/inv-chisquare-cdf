@@ -1,0 +1,29 @@
+{
+  "name": "inv-chisquare-cdf",
+  "version": "1.0.0",
+  "description": "Inverse chi-squared cumulative distribution function",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zetos/inv-chisquare-cdf.git"
+  },
+  "keywords": [
+    "inverse",
+    "chi",
+    "squared",
+    "cdf",
+    "mathematics",
+    "lanczos",
+    "approximation",
+    "gamma"
+  ],
+  "author": "Zetos Lima <cesar_manoel@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zetos/inv-chisquare-cdf/issues"
+  },
+  "homepage": "https://github.com/zetos/inv-chisquare-cdf#readme"
+}
