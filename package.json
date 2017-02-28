@@ -4,7 +4,8 @@
   "description": "Inverse chi-squared cumulative distribution function",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha src",
+    "watch": "mocha -w src"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,10 @@
   },
   "homepage": "https://github.com/zetos/inv-chisquare-cdf#readme",
   "devDependencies": {
+    "chai": "^3.5.0",
     "eslint": "^3.16.1",
-    "eslint-config-google": "^0.7.1"
+    "eslint-config-google": "^0.7.1",
+    "eslint-plugin-mocha": "^4.8.0",
+    "mocha": "^3.2.0"
   }
 }
