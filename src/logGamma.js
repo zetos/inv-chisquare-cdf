@@ -4,9 +4,8 @@ module.exports = function logGamma(x) {
     } else if(x===0) {
         return Infinity;
     } else if(isNaN(x)) {
-        // booleans and strings like '123' will not fall here.
+        // TODO fix: booleans and strings like '123' will not fall here.
         throw new Error(`The value is not a number.`);
-        // throw new Error('msg');
     } else if(x<0) {
         throw new Error(`The value is a negative number.`);
     }
