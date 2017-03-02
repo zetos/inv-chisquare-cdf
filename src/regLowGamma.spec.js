@@ -20,7 +20,7 @@ describe('regLowGamma', function() {
 		});
 
 		it('should return 0.9987538088133204 for a=0.666 and x=5.75', ()=>{
-			expect(regLowGamma(5, 0)).to.equal(0.9987538088133204);
+			expect(regLowGamma(0.666, 5.75)).to.equal(0.9987538088133204);
 		});
 
 		it('should return 0 for a=5 and x=0', ()=>{
@@ -29,12 +29,16 @@ describe('regLowGamma', function() {
 	});
 
 	describe('error tests', function() {
+        it('should return a error for a undefined input in the parameter: a and x', ()=>{
+			expect(()=>regLowGamma(undefined, undefined)).to.throw('The value is not a number.');
+		});
+
 		it('should return a error for a NaN input in the parameter: a', ()=>{
-			expect(()=>regLowGamma('Not a number')).to.throw('The value is not a number.');
+			expect(()=>regLowGamma('Not a number', 6)).to.throw('The value is not a number.');
 		});
 
         it('should return a error for a NaN input in the parameter: x', ()=>{
-			expect(()=>regLowGamma('Not a number')).to.throw('The value is not a number.');
+			expect(()=>regLowGamma(6, 'Not a number')).to.throw('The value is not a number.');
 		});
 
 		it('should return a error for a number lower or equal to 0 in the parameter: a', ()=>{
