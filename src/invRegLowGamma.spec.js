@@ -14,7 +14,7 @@ describe('invRegLowGamma', function() {
 		});
 	});
 
-	describe('the function returns the lower regularized incomplete gamma function evaluated at (p,a)', function() {
+	describe('Returns the inverse of the lower regularized incomplete Gamma function evaluated at (p,a)', function() {
 		it('should return 228.60679774997897 for p=5 and a=5', ()=>{
 			expect(invRegLowGamma(5, 5)).to.equal(228.60679774997897);
 		});
