@@ -29,24 +29,24 @@ describe('regLowGamma', function() {
 	});
 
 	describe('error tests', function() {
-        it('should return a error for a undefined input in the parameter: a and x', ()=>{
-			expect(()=>regLowGamma(undefined, undefined)).to.throw('The value is not a number.');
-		});
-
 		it('should return a error for a NaN input in the parameter: a', ()=>{
-			expect(()=>regLowGamma('Not a number', 6)).to.throw('The value is not a number.');
+			expect(()=>regLowGamma('Not a number', 6)).to.throw('The value in param a is not a number.');
 		});
 
         it('should return a error for a NaN input in the parameter: x', ()=>{
-			expect(()=>regLowGamma(6, 'Not a number')).to.throw('The value is not a number.');
+			expect(()=>regLowGamma(6, 'Not a number')).to.throw('The value in param x is not a number.');
 		});
 
-		it('should return a error for a number lower or equal to 0 in the parameter: a', ()=>{
-			expect(()=>regLowGamma(0, 2)).to.throw('The value is a negative number.');
+		it('should return a error for the input 0 in the parameter: a', ()=>{
+			expect(()=>regLowGamma(0, 2)).to.throw('The number in param a is equal or less tham 0.');
+		});
+
+        it('should return a error for a negative number in the parameter: a', ()=>{
+			expect(()=>regLowGamma(-666, 2)).to.throw('The number in param a is equal or less tham 0.');
 		});
 
         it('should return a error for a negative number in the parameter: x', ()=>{
-			expect(()=>regLowGamma(-666, 2)).to.throw('The value is a negative number.');
+			expect(()=>regLowGamma(2, -666)).to.throw('The number in param x is a negative number.');
 		});
 	});
 });
