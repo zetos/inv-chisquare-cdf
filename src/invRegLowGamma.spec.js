@@ -19,20 +19,24 @@ describe('invRegLowGamma', function() {
 			expect(invRegLowGamma(5, 5)).to.equal(228.60679774997897);
 		});
 
-		it('should return 6.475606702314749 for p=0.666 and a=5.75', ()=>{
-			expect(invRegLowGamma(0.666, 5.75)).to.equal(6.475606702314749);
+		it('should return 6.475606702314761 for p=0.666 and a=5.75', ()=>{
+			expect(invRegLowGamma(0.666, 5.75)).to.equal(6.475606702314761);
 		});
 
 		it('should return 100 for p=5 and a=0', ()=>{
 			expect(invRegLowGamma(5, 0)).to.equal(100);
 		});
 
-        it('should return 1.67834699001666 for p=0.5 and a=2', ()=>{
-			expect(invRegLowGamma(5, 0)).to.equal(1.67834699001666);
+        it('should return 1.678346990016661 for p=0.5 and a=2', ()=>{
+			expect(invRegLowGamma(0.5, 2)).to.equal(1.678346990016661);
 		});
 
-        it('should return 0.3759413598815401 for p=0.5 and a=0.666', ()=>{
-			expect(invRegLowGamma(5, 0)).to.equal(0.3759413598815401);
+        it('should return 0.3759413598815398 for p=0.5 and a=0.666', ()=>{
+			expect(invRegLowGamma(0.5, 0.666)).to.equal(0.3759413598815398);
+		});
+
+        it('should return 0 for p=-1(any negative number) and a=2', ()=>{
+			expect(invRegLowGamma(-1, 2)).to.equal(0);
 		});
 	});
 
