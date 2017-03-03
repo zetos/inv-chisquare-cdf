@@ -1,8 +1,8 @@
 {
   "name": "inv-chisquare-cdf",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Inverse chi-squared cumulative distribution function",
-  "main": "index.js",
+  "main": "src/invChiSquareCDF.js",
   "scripts": {
     "test": "mocha src",
     "watch": "mocha -w src"
