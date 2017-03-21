@@ -15,7 +15,3 @@ module.exports = function invChiSquareCDF(probability, degreeOfFreedom) {
 
     return 2 * invRegLowGamma(probability, 0.5 * degreeOfFreedom);
 };
-
-// inv: function(p, dof) {
-//     return 2 * jStat.gammapinv(p, 0.5 * dof);
-//   }
