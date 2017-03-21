@@ -1,11 +1,13 @@
 {
   "name": "inv-chisquare-cdf",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Inverse chi-squared cumulative distribution function",
-  "main": "src/invChiSquareCDF.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha src",
-    "watch": "mocha -w src"
+    "watch": "mocha -w src",
+    "coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec src",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
     "type": "git",
@@ -30,9 +32,9 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "coveralls": "^2.12.0",
-    "eslint": "^3.16.1",
+    "eslint": "^3.18.0",
     "eslint-config-google": "^0.7.1",
-    "eslint-plugin-mocha": "^4.8.0",
+    "eslint-plugin-mocha": "^4.9.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0"
   }
