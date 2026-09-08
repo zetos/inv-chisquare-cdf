@@ -2,12 +2,35 @@
   "name": "inv-chisquare-cdf",
   "version": "1.0.1",
   "description": "Inverse chi-squared cumulative distribution function",
-  "main": "src/index.js",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist/src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "test": "mocha src",
-    "watch": "mocha -w src",
-    "coverage": "nyc npm test",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "npm run build && node --test --test-reporter=spec dist/test/*.test.js",
+    "coverage": "npm run build && c8 --all --extension=.js --include=dist/src/**/*.js --exclude=dist/test/** --reporter=text --reporter=lcov node --test --test-reporter=spec dist/test/*.test.js",
+    "prepack": "npm run build",
+    "check:package": "npm pack --dry-run --ignore-scripts",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
@@ -30,13 +53,10 @@
   },
   "homepage": "https://github.com/zetos/inv-chisquare-cdf#readme",
   "devDependencies": {
-    "chai": "^4.2.0",
-    "coveralls": "^3.0.6",
-    "eslint": "^9.32.0",
-    "eslint-config-google": "^0.13.0",
-    "eslint-plugin-mocha": "^6.1.0",
-    "mocha": "^10.1.0",
-    "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^14.1.1"
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.2",
+    "@types/node": "^24.0.0",
+    "c8": "^12.0.0",
+    "typescript": "^7.0.2"
   }
 }

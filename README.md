@@ -1,9 +1,25 @@
-# Inverse Chi-squared cumulative distribution function [![Build Status](https://travis-ci.org/zetos/inv-chisquare-cdf.svg?branch=master)](https://travis-ci.org/zetos/inv-chisquare-cdf) [![Coverage Status](https://coveralls.io/repos/github/zetos/inv-chisquare-cdf/badge.svg?branch=master)](https://coveralls.io/github/zetos/inv-chisquare-cdf?branch=master)
+# Inverse Chi-squared cumulative distribution function [![CI](https://github.com/zetos/inv-chisquare-cdf/actions/workflows/ci.yml/badge.svg)](https://github.com/zetos/inv-chisquare-cdf/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/zetos/inv-chisquare-cdf/graph/badge.svg)](https://codecov.io/gh/zetos/inv-chisquare-cdf)
 
 **inv-chisquare-cdf** is an alternative implementation of the `jStat.chisquare.inv` in the *jStat* package using ES6.
 
 ## Install
-`$ npm install --save inv-chisquare-cdf`
+
+```sh
+npm install inv-chisquare-cdf
+```
+
+This v2 release requires Node.js 24 or later and is ESM-only.
+
+```js
+import {
+  invChiSquareCDF,
+  invRegLowGamma,
+  logGamma,
+  regLowGamma,
+} from 'inv-chisquare-cdf';
+```
+
+CommonJS `require()` is not supported in v2.
 
 ## Functions
 * `invChiSquareCDF(probability, degreeOfFreedom)` 
