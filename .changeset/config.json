@@ -1,0 +1,11 @@
+{
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "zetos/inv-chisquare-cdf" }
+  ],
+  "commit": false,
+  "access": "public",
+  "baseBranch": "master",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
