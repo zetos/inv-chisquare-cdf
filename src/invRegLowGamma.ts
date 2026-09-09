@@ -48,12 +48,9 @@ export function invRegLowGamma(p: number, a: number): number {
     const afac = Math.exp(a1 * (lna1 - 1) - logGammaOfA);
     const probabilityTail = p < 0.5 ? p : 1 - p;
     const t = Math.sqrt(-2 * Math.log(probabilityTail));
-    let approximation =
-      (2.30753 + t * 0.27061) / (1 + t * (0.99229 + t * 0.04481)) - t;
-
-    if (p < 0.5) {
-      approximation = -approximation;
-    }
+    const approximation =
+      (p < 0.5 ? -1 : 1) *
+      ((2.30753 + t * 0.27061) / (1 + t * (0.99229 + t * 0.04481)) - t);
 
     inverseRegLowGamma = Math.max(
       1e-3,
@@ -90,11 +87,8 @@ export function invRegLowGamma(p: number, a: number): number {
     const step =
       correction /
       (1 - 0.5 * Math.min(1, correction * ((a - 1) / inverseRegLowGamma - 1)));
-    inverseRegLowGamma -= step;
-
-    if (inverseRegLowGamma <= 0) {
-      inverseRegLowGamma = 0.5 * (inverseRegLowGamma + step);
-    }
+    const candidate = inverseRegLowGamma - step;
+    inverseRegLowGamma = candidate <= 0 ? 0.5 * (candidate + step) : candidate;
 
     if (Math.abs(step) < epsilon * inverseRegLowGamma) {
       break;

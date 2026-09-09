@@ -1,3 +1,8 @@
+const LANCZOS_COEFFICIENTS = [
+  76.18009172947146, -86.50532032941677, 24.01409824083091,
+  -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5,
+] as const;
+
 /**
  * Approximates the natural logarithm of the gamma function.
  *
@@ -32,18 +37,12 @@ export function logGamma(x: number): number {
     throw new Error('The value is a negative number.');
   }
 
-  const coefficients = [
-    76.18009172947146, -86.50532032941677, 24.01409824083091,
-    -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5,
-  ];
-  let series = 1.000000000190015;
-  let denominator = x;
-  let temporary = denominator + 5.5;
-  temporary -= (denominator + 0.5) * Math.log(temporary);
-
-  for (const coefficient of coefficients) {
-    series += coefficient / ++denominator;
-  }
+  const shifted = x + 5.5;
+  const temporary = shifted - (x + 0.5) * Math.log(shifted);
+  const series = LANCZOS_COEFFICIENTS.reduce(
+    (sum, coefficient, index) => sum + coefficient / (x + index + 1),
+    1.000000000190015,
+  );
 
   return Math.log((2.5066282746310005 * series) / x) - temporary;
 }

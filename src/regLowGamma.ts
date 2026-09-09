@@ -37,11 +37,6 @@ export function regLowGamma(a: number, x: number): number {
   }
 
   const logGammaOfA = logGamma(a);
-  let b = x + 1 - a;
-  let c = 1 / 1.0e-30;
-  let d = 1 / b;
-  let h = d;
-  let iteration = 1;
   const maximumIterations = -~(
     Math.log(a >= 1 ? a : 1 / a) * 8.5 +
     a * 0.4 +
@@ -51,16 +46,26 @@ export function regLowGamma(a: number, x: number): number {
   if (x < a + 1) {
     let sum = 1 / a;
     let delta = sum;
+    let denominator = a + 1;
 
-    for (let ap = a; iteration <= maximumIterations; iteration++) {
-      delta *= x / ++ap;
+    for (
+      let iteration = 1;
+      iteration <= maximumIterations;
+      iteration++, denominator++
+    ) {
+      delta *= x / denominator;
       sum += delta;
     }
 
     return sum * Math.exp(-x + a * Math.log(x) - logGammaOfA);
   }
 
-  for (; iteration <= maximumIterations; iteration++) {
+  let b = x + 1 - a;
+  let c = 1 / 1.0e-30;
+  let d = 1 / b;
+  let h = d;
+
+  for (let iteration = 1; iteration <= maximumIterations; iteration++) {
     const an = -iteration * (iteration - a);
     b += 2;
     d = an * d + b;
