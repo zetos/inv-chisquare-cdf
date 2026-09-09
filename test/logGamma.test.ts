@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import {describe, it} from 'node:test';
+import { describe, it } from 'node:test';
 
-import {logGamma} from '../src/logGamma.js';
-import {assertClose} from './assertClose.js';
+import { logGamma } from '../src/logGamma.js';
+import { assertClose } from './assertClose.js';
 
 describe('logGamma', () => {
   it('returns the logarithm of the gamma function', () => {
@@ -12,16 +12,15 @@ describe('logGamma', () => {
     assert.strictEqual(logGamma(1), 0);
     assert.strictEqual(logGamma(2), 0);
     assert.strictEqual(logGamma(0), Infinity);
+    assertClose(logGamma(Number.MIN_VALUE), -Math.log(Number.MIN_VALUE));
   });
 
   it('rejects invalid inputs', () => {
-    assert.throws(
-      () => logGamma('Not a number' as unknown as number),
-      {message: 'The value is not a number.'},
-    );
-    assert.throws(
-      () => logGamma(-666),
-      {message: 'The value is a negative number.'},
-    );
+    assert.throws(() => logGamma('Not a number' as unknown as number), {
+      message: 'The value is not a number.',
+    });
+    assert.throws(() => logGamma(-666), {
+      message: 'The value is a negative number.',
+    });
   });
 });

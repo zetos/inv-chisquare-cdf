@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import fc from 'fast-check';
 
+import { chiSquareCDF, chiSquareSurvival } from '../src/chiSquareCDF.js';
 import { invChiSquareCDF } from '../src/invChiSquareCDF.js';
 import { invRegLowGamma } from '../src/invRegLowGamma.js';
 import { logGamma } from '../src/logGamma.js';
@@ -218,6 +219,63 @@ describe('numerical properties', () => {
 
           assertClose(invChiSquareCDF(probability, 2), expected, 1e-9);
         }),
+        { numRuns: 200 },
+      );
+    });
+  });
+
+  describe('chi-square probabilities', () => {
+    it('matches the exponential distribution for two degrees of freedom', () => {
+      fc.assert(
+        fc.property(fc.double({ min: 0, max: 100, noNaN: true }), (value) => {
+          const expectedSurvival = Math.exp(-value / 2);
+
+          assertClose(chiSquareCDF(value, 2), 1 - expectedSurvival, 1e-9);
+          assertClose(chiSquareSurvival(value, 2), expectedSurvival, 1e-9);
+        }),
+        { numRuns: 200 },
+      );
+    });
+
+    it('returns bounded, complementary probabilities', () => {
+      fc.assert(
+        fc.property(
+          fc.double({ min: 0, max: 100, noNaN: true }),
+          positiveShapeArbitrary,
+          (value, degreesOfFreedom) => {
+            const lower = chiSquareCDF(value, degreesOfFreedom);
+            const upper = chiSquareSurvival(value, degreesOfFreedom);
+
+            assertFiniteProbability(lower);
+            assertFiniteProbability(upper);
+            assertClose(lower + upper, 1);
+          },
+        ),
+        { numRuns: 200 },
+      );
+    });
+
+    it('is monotonic in the evaluated value', () => {
+      const valueArbitrary = fc.double({ min: 0, max: 200, noNaN: true });
+
+      fc.assert(
+        fc.property(
+          fc.tuple(valueArbitrary, valueArbitrary),
+          positiveShapeArbitrary,
+          ([firstValue, secondValue], degreesOfFreedom) => {
+            const lowerValue = Math.min(firstValue, secondValue);
+            const upperValue = Math.max(firstValue, secondValue);
+
+            assert.ok(
+              chiSquareCDF(lowerValue, degreesOfFreedom) <=
+                chiSquareCDF(upperValue, degreesOfFreedom) + 1e-12,
+            );
+            assert.ok(
+              chiSquareSurvival(lowerValue, degreesOfFreedom) + 1e-12 >=
+                chiSquareSurvival(upperValue, degreesOfFreedom),
+            );
+          },
+        ),
         { numRuns: 200 },
       );
     });
