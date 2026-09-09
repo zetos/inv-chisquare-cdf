@@ -1,3 +1,20 @@
+/**
+ * Approximates the natural logarithm of the gamma function.
+ *
+ * At `x = 0`, where the gamma function has a pole, this function returns
+ * `Infinity`.
+ *
+ * @param x - Non-negative argument at which to evaluate `log(Gamma(x))`.
+ * @returns The natural logarithm of `Gamma(x)`, or `Infinity` when `x` is 0.
+ * @throws {Error} If `x` is not a number, is `NaN`, or is negative.
+ *
+ * @example
+ * ```js
+ * import { logGamma } from 'inv-chisquare-cdf';
+ *
+ * const value = logGamma(5); // ~3.1780538303479453
+ * ```
+ */
 export function logGamma(x: number): number {
   if (typeof x !== 'number' || Number.isNaN(x)) {
     throw new Error('The value is not a number.');

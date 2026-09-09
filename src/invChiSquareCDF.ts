@@ -1,5 +1,24 @@
 import { invRegLowGamma } from './invRegLowGamma.js';
 
+/**
+ * Computes a quantile of the chi-square distribution.
+ *
+ * Returns the non-negative value `x` for which a chi-square random variable
+ * with the given degrees of freedom has `P(X <= x) = probability`.
+ *
+ * @param probability - Cumulative probability, strictly between 0 and 1.
+ * @param degreeOfFreedom - Number of degrees of freedom, greater than 0.
+ * @returns The chi-square quantile corresponding to `probability`.
+ * @throws {Error} If an argument is not a number or is `NaN`.
+ * @throws {Error} If `probability` or `degreeOfFreedom` is outside its domain.
+ *
+ * @example
+ * ```js
+ * import { invChiSquareCDF } from 'inv-chisquare-cdf';
+ *
+ * const quantile = invChiSquareCDF(0.95, 10); // ~18.307038053275143
+ * ```
+ */
 export function invChiSquareCDF(
   probability: number,
   degreeOfFreedom: number,

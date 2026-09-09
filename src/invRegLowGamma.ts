@@ -1,6 +1,25 @@
 import { logGamma } from './logGamma.js';
 import { regLowGamma } from './regLowGamma.js';
 
+/**
+ * Approximates the inverse of the lower regularized incomplete gamma function.
+ *
+ * For `0 < p < 1`, returns `x` such that `regLowGamma(a, x)` is approximately
+ * `p`. Values of `p <= 0` return 0; values of `p >= 1` return a finite upper
+ * sentinel because the mathematical inverse approaches infinity.
+ *
+ * @param p - Regularized probability. Use a value between 0 and 1 for an inverse.
+ * @param a - Positive shape parameter of the gamma function.
+ * @returns The approximate inverse value for `p`, or the boundary value described above.
+ * @throws {Error} If an argument is not a number or is `NaN`.
+ *
+ * @example
+ * ```js
+ * import { invRegLowGamma } from 'inv-chisquare-cdf';
+ *
+ * const x = invRegLowGamma(0.5, 2); // ~1.678346990016661
+ * ```
+ */
 export function invRegLowGamma(p: number, a: number): number {
   if (typeof p !== 'number' || Number.isNaN(p)) {
     throw new Error('The value in param "p" is not an number.');

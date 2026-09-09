@@ -1,5 +1,24 @@
 import { logGamma } from './logGamma.js';
 
+/**
+ * Computes the lower regularized incomplete gamma function `P(a, x)`.
+ *
+ * The result is the lower incomplete gamma function evaluated at `a` and `x`,
+ * divided by `Gamma(a)`.
+ *
+ * @param a - Positive shape parameter of the gamma function.
+ * @param x - Non-negative upper integration limit.
+ * @returns The regularized value, normally between 0 and 1.
+ * @throws {Error} If an argument is not a number or is `NaN`.
+ * @throws {Error} If `a <= 0` or `x < 0`.
+ *
+ * @example
+ * ```js
+ * import { regLowGamma } from 'inv-chisquare-cdf';
+ *
+ * const probability = regLowGamma(5, 5); // ~0.5595067149347875
+ * ```
+ */
 export function regLowGamma(a: number, x: number): number {
   if (typeof a !== 'number' || Number.isNaN(a)) {
     throw new Error('The value in param a is not a number.');
