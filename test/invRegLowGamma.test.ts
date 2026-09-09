@@ -12,6 +12,14 @@ describe('invRegLowGamma', () => {
     assertClose(invRegLowGamma(0.5, 2), 1.678346990016661);
     assertClose(invRegLowGamma(0.5, 0.666), 0.3759413598815398);
     assert.strictEqual(invRegLowGamma(-1, 2), 0);
+    assert.strictEqual(invRegLowGamma(Number.MIN_VALUE, 0.5), 0);
+  });
+
+  it('recovers when an iteration crosses zero', () => {
+    const inverse = invRegLowGamma(1 - Number.EPSILON, 1e-18);
+
+    assert.ok(Number.isFinite(inverse));
+    assert.ok(inverse > 0);
   });
 
   it('rejects non-numeric inputs', () => {
