@@ -6,6 +6,10 @@
 - This is an ESM-only TypeScript library. Keep `.js` extensions on relative imports and exports in `.ts` source files; `tsconfig.json` uses `NodeNext` resolution.
 - `src/index.ts` is the public package surface. Source and `node:test` tests compile together into the ignored `dist/` directory.
 
+## Implementation style
+
+Prefer pure functional code, avoid mutations and use folds and recursions as default (unless it would add substantial performance overhead due to array or object allocation or it would be unsafe to add a recursion due to the lack of a tail-call optimization in node). Load the `functional-refactoring` skill for detailed guidance.
+
 ## Validation
 
 - CI runs `npm run typecheck` followed by `npm run coverage`; use that order for complete verification.

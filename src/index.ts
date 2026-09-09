@@ -1,3 +1,4 @@
+export { chiSquareCDF, chiSquareSurvival } from './chiSquareCDF.js';
 export { invChiSquareCDF } from './invChiSquareCDF.js';
 export { invRegLowGamma } from './invRegLowGamma.js';
 export { logGamma } from './logGamma.js';

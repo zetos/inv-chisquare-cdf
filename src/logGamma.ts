@@ -1,7 +1,8 @@
 const LANCZOS_COEFFICIENTS = [
-  76.18009172947146, -86.50532032941677, 24.01409824083091,
-  -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5,
+  76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155,
+  0.1208650973866179e-2, -0.5395239384953e-5,
 ] as const;
+const EULER_MASCHERONI = 0.5772156649015329;
 
 /**
  * Approximates the natural logarithm of the gamma function.
@@ -35,6 +36,10 @@ export function logGamma(x: number): number {
 
   if (x < 0) {
     throw new Error('The value is a negative number.');
+  }
+
+  if (x < Math.sqrt(Number.EPSILON)) {
+    return -Math.log(x) + Math.log1p(-EULER_MASCHERONI * x);
   }
 
   const shifted = x + 5.5;

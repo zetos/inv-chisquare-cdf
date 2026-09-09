@@ -1,7 +1,7 @@
 {
   "name": "inv-chisquare-cdf",
   "version": "2.0.1",
-  "description": "Inverse chi-squared cumulative distribution function",
+  "description": "Chi-square cumulative, survival, and inverse distribution functions",
   "type": "module",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
