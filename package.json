@@ -1,6 +1,6 @@
 {
   "name": "inv-chisquare-cdf",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Chi-square distribution functions and statistical helpers",
   "type": "module",
   "main": "./dist/src/index.js",
