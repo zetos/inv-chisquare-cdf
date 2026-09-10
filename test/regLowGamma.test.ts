@@ -12,9 +12,11 @@ describe('regLowGamma', () => {
     assertClose(regUpperGamma(5, 5), 0.4404932850652124);
     assertClose(regUpperGamma(0.1, 1), 0.02412734372632778);
     assertClose(regUpperGamma(1e-15, 0.5), 5.597735947761609e-16);
+    assertClose(regUpperGamma(1e-12, 1e-18) / 4.086931600899129e-11, 1);
     assert.strictEqual(regUpperGamma(5, 0), 1);
     assert.strictEqual(regUpperGamma(5, Infinity), 0);
     assert.strictEqual(regLowGamma(5, Infinity), 1);
+    assertClose(regLowGamma(2e6, 2e6), 0.5000940315975192, 2e-9);
   });
 
   it('rejects invalid inputs', () => {
