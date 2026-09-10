@@ -1,5 +1,11 @@
 # inv-chisquare-cdf
 
+## 2.1.1
+
+### Patch Changes
+
+- [#38](https://github.com/zetos/inv-chisquare-cdf/pull/38) [`81f0172`](https://github.com/zetos/inv-chisquare-cdf/commit/81f01720e87ba0168f9f0fed338a2a3eaa7cc7f2) Thanks [@zetos](https://github.com/zetos)! - Correct upper-tail probabilities for small shape and argument values, and improve accuracy and runtime near the large-shape transition.
+
 ## 2.1.0
 
 ### Minor Changes
