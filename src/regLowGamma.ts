@@ -2,7 +2,9 @@ import { logGamma } from './logGamma.js';
 
 const EPSILON = 1e-15;
 const MAXIMUM_ITERATIONS = 100_000;
-const LARGE_SHAPE = 1e7;
+const LARGE_SHAPE = 2e6;
+const SMALL_SHAPE = 1e-8;
+const EULER_MASCHERONI = 0.5772156649015329;
 const ERFC_COEFFICIENTS = [
   1.00002368, 0.37409196, 0.09678418, -0.18628806, 0.27886807, -1.13520398,
   1.48851587, -0.82215223, 0.17087277,
@@ -70,14 +72,18 @@ function regularizedGamma(a: number, x: number, upperTail: boolean): number {
     return approximateLargeShapeTail(a, x, upperTail);
   }
 
+  if (upperTail && a < SMALL_SHAPE && x < 0.1) {
+    return clampProbability(a * exponentialIntegral(x));
+  }
+
   if (x < a + 1) {
     const lower = lowerGammaSeries(a, x);
 
-    return upperTail
-      ? lower < 0.9
-        ? 1 - lower
-        : upperGammaFraction(a, x)
-      : lower;
+    if (!upperTail) {
+      return lower;
+    }
+
+    return lower >= 1 - 1e-8 && x >= 0.1 ? upperGammaFraction(a, x) : 1 - lower;
   }
 
   const upper = upperGammaFraction(a, x);
@@ -122,6 +128,23 @@ function upperGammaFraction(a: number, x: number): number {
   }
 
   return clampProbability(h * Math.exp(-x + a * Math.log(x) - logGamma(a)));
+}
+
+function exponentialIntegral(x: number): number {
+  let sum = 0;
+  let term = 1;
+
+  for (let iteration = 1; iteration <= MAXIMUM_ITERATIONS; iteration++) {
+    term *= -x / iteration;
+    const delta = term / iteration;
+    sum += delta;
+
+    if (Math.abs(delta) <= Math.abs(sum) * EPSILON) {
+      break;
+    }
+  }
+
+  return -EULER_MASCHERONI - Math.log(x) - sum;
 }
 
 function approximateLargeShapeTail(
