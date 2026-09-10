@@ -1,5 +1,15 @@
 # inv-chisquare-cdf
 
+## 2.1.0
+
+### Minor Changes
+
+- [#36](https://github.com/zetos/inv-chisquare-cdf/pull/36) [`8fd0610`](https://github.com/zetos/inv-chisquare-cdf/commit/8fd0610a0963055076ac3e8d5dc21afb9a3f0fb1) Thanks [@zetos](https://github.com/zetos)! - Add chi-square cumulative distribution and numerically stable survival functions.
+
+### Patch Changes
+
+- [#36](https://github.com/zetos/inv-chisquare-cdf/pull/36) [`8fd0610`](https://github.com/zetos/inv-chisquare-cdf/commit/8fd0610a0963055076ac3e8d5dc21afb9a3f0fb1) Thanks [@zetos](https://github.com/zetos)! - Improve gamma-function precision and performance with convergence-based evaluation, stable upper-tail calculations, and safe handling of very small or large shape parameters.
+
 ## 2.0.1
 
 ### Patch Changes
