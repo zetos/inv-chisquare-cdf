@@ -1,5 +1,11 @@
 # inv-chisquare-cdf
 
+## 2.2.0
+
+### Minor Changes
+
+- [#41](https://github.com/zetos/inv-chisquare-cdf/pull/41) [`efe374e`](https://github.com/zetos/inv-chisquare-cdf/commit/efe374e8fd5ade69f6ffea5cec2cfd9ba9774dda) Thanks [@zetos](https://github.com/zetos)! - Add Pearson chi-square statistic and goodness-of-fit helpers, plus confidence intervals for the variance of a normal population.
+
 ## 2.1.1
 
 ### Patch Changes
