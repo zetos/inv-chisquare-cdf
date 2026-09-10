@@ -1,0 +1,79 @@
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+
+import { normalVarianceConfidenceInterval } from '../src/normalVarianceConfidenceInterval.js';
+import { assertClose } from './assertClose.js';
+
+describe('normalVarianceConfidenceInterval', () => {
+  it('returns a reference confidence interval for population variance', () => {
+    const interval = normalVarianceConfidenceInterval(4, 20, 0.95);
+
+    assertClose(interval.lower, 2.313382559472031, 1e-9);
+    assertClose(interval.upper, 8.533078016943891, 1e-9);
+  });
+
+  it('defaults to a 95% confidence level', () => {
+    const defaultInterval = normalVarianceConfidenceInterval(25, 30);
+    const explicitInterval = normalVarianceConfidenceInterval(25, 30, 0.95);
+
+    assertClose(defaultInterval.lower, explicitInterval.lower);
+    assertClose(defaultInterval.upper, explicitInterval.upper);
+  });
+
+  it('returns a zero interval for zero sample variance', () => {
+    assert.deepStrictEqual(normalVarianceConfidenceInterval(0, 20), {
+      lower: 0,
+      upper: 0,
+    });
+  });
+
+  it('scales linearly with sample variance', () => {
+    const first = normalVarianceConfidenceInterval(4, 20);
+    const second = normalVarianceConfidenceInterval(12, 20);
+
+    assertClose(second.lower, 3 * first.lower);
+    assertClose(second.upper, 3 * first.upper);
+  });
+
+  it('widens as the confidence level increases', () => {
+    const narrow = normalVarianceConfidenceInterval(4, 20, 0.9);
+    const wide = normalVarianceConfidenceInterval(4, 20, 0.99);
+
+    assert.ok(wide.lower < narrow.lower);
+    assert.ok(wide.upper > narrow.upper);
+  });
+
+  it('rejects invalid sample variances', () => {
+    for (const sampleVariance of [-1, Infinity, Number.NaN]) {
+      assert.throws(
+        () => normalVarianceConfidenceInterval(sampleVariance, 20),
+        { message: 'The sample variance must be finite and non-negative.' },
+      );
+    }
+  });
+
+  it('rejects invalid sample sizes', () => {
+    for (const sampleSize of [1, 1.5, Infinity, Number.NaN]) {
+      assert.throws(() => normalVarianceConfidenceInterval(4, sampleSize), {
+        message: 'The sample size must be an integer greater than 1.',
+      });
+    }
+  });
+
+  it('rejects invalid or unrepresentable confidence levels', () => {
+    for (const confidenceLevel of [0, 1, -1, Infinity, Number.NaN]) {
+      assert.throws(
+        () => normalVarianceConfidenceInterval(4, 20, confidenceLevel),
+        { message: 'The confidence level must be strictly between 0 and 1.' },
+      );
+    }
+
+    assert.throws(
+      () => normalVarianceConfidenceInterval(4, 20, 1 - Number.EPSILON / 2),
+      {
+        message:
+          'The confidence level is too close to 1 for its chi-square quantiles to be represented.',
+      },
+    );
+  });
+});
