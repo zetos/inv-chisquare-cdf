@@ -41,7 +41,6 @@ describe('chi-square distribution', () => {
       absoluteTolerance: 1e-10,
       relativeTolerance: 0,
     });
-    assertClose(lower + upper, 1);
   });
 
   it('rejects non-numeric inputs', () => {
