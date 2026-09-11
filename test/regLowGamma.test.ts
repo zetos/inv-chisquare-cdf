@@ -62,6 +62,14 @@ describe('regLowGamma', () => {
         absoluteTolerance,
       });
     }
+
+    assert.strictEqual(regLowGamma(2000, 2780), 1);
+    assertClose(regUpperGamma(2000, 2780), 4.337627635862428e-55, {
+      absoluteTolerance: 0,
+      relativeTolerance: 5e-10,
+    });
+    assert.strictEqual(regLowGamma(100_000, 139_000), 1);
+    assert.strictEqual(regUpperGamma(100_000, 139_000), 0);
   });
 
   it('rejects invalid inputs', () => {
