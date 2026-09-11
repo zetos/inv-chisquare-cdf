@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import fc from 'fast-check';
+
 import { chiSquareSurvival } from '../src/chiSquareCDF.js';
 import {
   chiSquareGoodnessOfFit,
@@ -16,6 +18,48 @@ describe('chiSquareStatistic', () => {
 
   it('accepts a single category without requiring matching totals', () => {
     assert.strictEqual(chiSquareStatistic([2], [1]), 1);
+  });
+
+  it('is non-negative, permutation invariant, and homogeneous', () => {
+    const frequenciesArbitrary = fc.array(
+      fc.record({
+        observed: fc.double({ min: 0, max: 1e4, noNaN: true }),
+        expected: fc.double({ min: 1e-3, max: 1e4, noNaN: true }),
+      }),
+      { minLength: 1, maxLength: 20 },
+    );
+
+    fc.assert(
+      fc.property(
+        frequenciesArbitrary,
+        fc.double({ min: 0.1, max: 10, noNaN: true }),
+        (frequencies, scale) => {
+          const observed = frequencies.map(({ observed: value }) => value);
+          const expected = frequencies.map(({ expected: value }) => value);
+          const statistic = chiSquareStatistic(observed, expected);
+          const reversed = chiSquareStatistic(
+            observed.toReversed(),
+            expected.toReversed(),
+          );
+          const scaled = chiSquareStatistic(
+            observed.map((value) => scale * value),
+            expected.map((value) => scale * value),
+          );
+
+          assert.ok(statistic >= 0);
+          assertClose(reversed, statistic, {
+            absoluteTolerance: 1e-12,
+            relativeTolerance: 1e-14,
+          });
+          assertClose(scaled, scale * statistic, {
+            absoluteTolerance: 1e-12,
+            relativeTolerance: 1e-14,
+          });
+          assert.strictEqual(chiSquareStatistic(expected, expected), 0);
+        },
+      ),
+      { numRuns: 200 },
+    );
   });
 
   it('rejects invalid arrays', () => {

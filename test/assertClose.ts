@@ -1,11 +1,22 @@
 import assert from 'node:assert/strict';
 
-export function assertClose(actual: number, expected: number, relativeTolerance = 1e-12): void {
+type CloseTolerance = {
+  absoluteTolerance?: number;
+  relativeTolerance?: number;
+};
+
+export function assertClose(
+  actual: number,
+  expected: number,
+  { absoluteTolerance = 1e-12, relativeTolerance = 0 }: CloseTolerance = {},
+): void {
   const difference = Math.abs(actual - expected);
-  const tolerance = relativeTolerance * Math.max(1, Math.abs(expected));
+  const tolerance = absoluteTolerance + relativeTolerance * Math.abs(expected);
 
   assert.ok(
     difference <= tolerance,
-    `expected ${actual} to be within ${tolerance} of ${expected}; difference was ${difference}`,
+    `expected ${actual} to be within ${tolerance} of ${expected} ` +
+      `(absolute tolerance ${absoluteTolerance}, relative tolerance ${relativeTolerance}); ` +
+      `difference was ${difference}`,
   );
 }

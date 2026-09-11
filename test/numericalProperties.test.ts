@@ -7,12 +7,18 @@ import { chiSquareCDF, chiSquareSurvival } from '../src/chiSquareCDF.js';
 import { invChiSquareCDF } from '../src/invChiSquareCDF.js';
 import { invRegLowGamma } from '../src/invRegLowGamma.js';
 import { logGamma } from '../src/logGamma.js';
-import { regLowGamma } from '../src/regLowGamma.js';
+import { regLowGamma, regUpperGamma } from '../src/regLowGamma.js';
 import { assertClose } from './assertClose.js';
 
 const probabilityArbitrary = fc.double({
   min: 1e-8,
   max: 1 - 1e-8,
+  noNaN: true,
+});
+
+const centralProbabilityArbitrary = fc.double({
+  min: 1e-8,
+  max: 1 - 1e-6,
   noNaN: true,
 });
 
@@ -22,9 +28,25 @@ const positiveShapeArbitrary = fc.double({
   noNaN: true,
 });
 
+const orderedProbabilityPairArbitrary = fc
+  .double({ min: 1e-8, max: 1 - 3e-8, noNaN: true })
+  .chain((lowerProbability) =>
+    fc
+      .double({
+        min: lowerProbability + 1e-8,
+        max: 1 - 1e-8,
+        noNaN: true,
+      })
+      .map((upperProbability) => [lowerProbability, upperProbability] as const),
+  );
+
 function erlangCDF(shape: number, x: number): number {
   const sum = erlangSeriesSum(shape, x);
   return -Math.expm1(Math.log(sum) - x);
+}
+
+function erlangSurvival(shape: number, x: number): number {
+  return Math.exp(Math.log(erlangSeriesSum(shape, x)) - x);
 }
 
 function erlangSeriesSum(
@@ -51,11 +73,16 @@ function assertFiniteProbability(probability: number): void {
     Number.isFinite(probability),
     `expected ${probability} to be finite`,
   );
-  assert.ok(probability >= -1e-12, `expected ${probability} to be at least 0`);
-  assert.ok(
-    probability <= 1 + 1e-12,
-    `expected ${probability} to be at most 1`,
-  );
+  assert.ok(probability >= 0, `expected ${probability} to be at least 0`);
+  assert.ok(probability <= 1, `expected ${probability} to be at most 1`);
+}
+
+function adjacentPositiveFloat(value: number, direction: -1 | 1): number {
+  const buffer = new ArrayBuffer(8);
+  const view = new DataView(buffer);
+  view.setFloat64(0, value);
+  view.setBigUint64(0, view.getBigUint64(0) + BigInt(direction));
+  return view.getFloat64(0);
 }
 
 describe('numerical properties', () => {
@@ -63,7 +90,10 @@ describe('numerical properties', () => {
     it('matches log factorial for positive integers', () => {
       fc.assert(
         fc.property(fc.integer({ min: 1, max: 1000 }), (n) => {
-          assertClose(logGamma(n), logFactorial(n), 1e-12);
+          assertClose(logGamma(n), logFactorial(n), {
+            absoluteTolerance: 2e-10,
+            relativeTolerance: 1e-14,
+          });
         }),
         { numRuns: 200 },
       );
@@ -76,10 +106,24 @@ describe('numerical properties', () => {
 
       fc.assert(
         fc.property(positiveLogScaleArbitrary, (x) => {
-          assertClose(logGamma(x + 1), Math.log(x) + logGamma(x), 2e-12);
+          assertClose(logGamma(x + 1), Math.log(x) + logGamma(x), {
+            absoluteTolerance: 5e-12,
+            relativeTolerance: 3e-15,
+          });
         }),
         { numRuns: 200 },
       );
+    });
+
+    it('satisfies the reflection identity', () => {
+      for (const x of [1e-8, 1e-4, 0.1, 0.25, 0.499]) {
+        const expected = Math.log(Math.PI) - Math.log(Math.sin(Math.PI * x));
+
+        assertClose(logGamma(x) + logGamma(1 - x), expected, {
+          absoluteTolerance: 2e-13,
+          relativeTolerance: 2e-14,
+        });
+      }
     });
   });
 
@@ -100,9 +144,63 @@ describe('numerical properties', () => {
 
       fc.assert(
         fc.property(erlangCaseArbitrary, ({ shape, x }) => {
-          assertClose(regLowGamma(shape, x), erlangCDF(shape, x), 1e-9);
+          assertClose(regLowGamma(shape, x), erlangCDF(shape, x), {
+            absoluteTolerance: 1e-10,
+            relativeTolerance: 1e-10,
+          });
         }),
         { numRuns: 300 },
+      );
+    });
+
+    it('matches the independent Erlang survival function, including tiny tails', () => {
+      for (const shape of [1, 2, 3, 5, 10, 25, 50]) {
+        for (const x of [
+          1e-12,
+          0.1,
+          shape,
+          shape + 1 - 1e-8,
+          shape + 1 + 1e-8,
+          2 * shape,
+          50,
+          100,
+          500,
+        ]) {
+          assertClose(regUpperGamma(shape, x), erlangSurvival(shape, x), {
+            absoluteTolerance: 0,
+            relativeTolerance: 2e-10,
+          });
+        }
+      }
+    });
+
+    it('remains continuous across numerical branch boundaries', () => {
+      for (const shape of [0.1, 1, 10, 10_000, 1e6]) {
+        const boundary = shape + 1;
+        const below = regLowGamma(shape, adjacentPositiveFloat(boundary, -1));
+        const at = regLowGamma(shape, boundary);
+        const tolerance = shape <= 10_000 ? 2e-10 : 2e-9;
+
+        assert.ok(
+          Math.abs(at - below) <= tolerance,
+          `unexpected jump at x = a + 1 for a = ${shape}: ${at - below}`,
+        );
+      }
+
+      const belowLargeShape = adjacentPositiveFloat(2e6, -1);
+      assert.ok(
+        Math.abs(
+          regLowGamma(2e6, 2e6) - regLowGamma(belowLargeShape, belowLargeShape),
+        ) <= 1e-9,
+      );
+
+      const belowSmallShape = adjacentPositiveFloat(1e-8, -1);
+      const belowSmallX = adjacentPositiveFloat(0.1, -1);
+      assert.ok(
+        Math.abs(
+          regUpperGamma(belowSmallShape, belowSmallX) -
+            regUpperGamma(1e-8, 0.1),
+        ) <= 2e-15,
       );
     });
 
@@ -122,7 +220,7 @@ describe('numerical properties', () => {
             assertFiniteProbability(lowerProbability);
             assertFiniteProbability(upperProbability);
             assert.ok(
-              lowerProbability <= upperProbability + 1e-12,
+              lowerProbability <= upperProbability,
               `expected P(${shape}, ${lowerX}) <= P(${shape}, ${upperX})`,
             );
           },
@@ -143,7 +241,10 @@ describe('numerical properties', () => {
 
             assert.ok(Number.isFinite(inverse));
             assert.ok(inverse >= 0);
-            assertClose(erlangCDF(shape, inverse), probability, 1e-9);
+            assertClose(erlangCDF(shape, inverse), probability, {
+              absoluteTolerance: 1e-10,
+              relativeTolerance: 1e-10,
+            });
           },
         ),
         { numRuns: 150 },
@@ -152,10 +253,13 @@ describe('numerical properties', () => {
 
     it('matches the exponential quantile for shape one', () => {
       fc.assert(
-        fc.property(probabilityArbitrary, (probability) => {
+        fc.property(centralProbabilityArbitrary, (probability) => {
           const expected = -Math.log1p(-probability);
 
-          assertClose(invRegLowGamma(probability, 1), expected, 1e-9);
+          assertClose(invRegLowGamma(probability, 1), expected, {
+            absoluteTolerance: 5e-10,
+            relativeTolerance: 1e-12,
+          });
         }),
         { numRuns: 200 },
       );
@@ -171,38 +275,66 @@ describe('numerical properties', () => {
 
             assert.ok(Number.isFinite(inverse));
             assert.ok(inverse >= 0);
-            assertClose(regLowGamma(shape, inverse), probability, 1e-9);
+            assertClose(regLowGamma(shape, inverse), probability, {
+              absoluteTolerance: 1e-11,
+              relativeTolerance: 1e-11,
+            });
           },
         ),
         { numRuns: 150 },
       );
     });
 
+    it('inverts tail probabilities using the independent Erlang formulas', () => {
+      for (const shape of [1, 2, 5, 25, 50]) {
+        for (const probability of [1e-8, 0.01, 0.5, 1 - 1e-8]) {
+          const inverse = invRegLowGamma(probability, shape);
+          const actualTail =
+            probability <= 0.5
+              ? erlangCDF(shape, inverse)
+              : erlangSurvival(shape, inverse);
+          const expectedTail = Math.min(probability, 1 - probability);
+
+          assertClose(actualTail, expectedTail, {
+            absoluteTolerance: 0,
+            relativeTolerance: 2e-7,
+          });
+        }
+      }
+    });
+
+    it('documents inverse accuracy at 1e-12 tails', () => {
+      for (const shape of [1, 2, 5, 25, 50]) {
+        for (const probability of [1e-12, 1 - 1e-12]) {
+          const inverse = invRegLowGamma(probability, shape);
+          const actualTail =
+            probability < 0.5
+              ? erlangCDF(shape, inverse)
+              : erlangSurvival(shape, inverse);
+
+          assertClose(actualTail, Math.min(probability, 1 - probability), {
+            absoluteTolerance: 0,
+            relativeTolerance: 5e-4,
+          });
+        }
+      }
+    });
+
     it('is nondecreasing in probability', () => {
       fc.assert(
         fc.property(
           positiveShapeArbitrary,
-          fc.tuple(probabilityArbitrary, probabilityArbitrary),
+          orderedProbabilityPairArbitrary,
           (shape, [firstProbability, secondProbability]) => {
-            const lowerProbability = Math.min(
-              firstProbability,
-              secondProbability,
-            );
-            const upperProbability = Math.max(
-              firstProbability,
-              secondProbability,
-            );
-            const lowerInverse = invRegLowGamma(lowerProbability, shape);
-            const upperInverse = invRegLowGamma(upperProbability, shape);
-            const tolerance = 1e-10 * Math.max(1, lowerInverse, upperInverse);
-
+            const lowerInverse = invRegLowGamma(firstProbability, shape);
+            const upperInverse = invRegLowGamma(secondProbability, shape);
             assert.ok(Number.isFinite(lowerInverse));
             assert.ok(Number.isFinite(upperInverse));
             assert.ok(lowerInverse >= 0);
             assert.ok(upperInverse >= 0);
             assert.ok(
-              lowerInverse <= upperInverse + tolerance,
-              `expected P^-1(${lowerProbability}, ${shape}) <= P^-1(${upperProbability}, ${shape})`,
+              lowerInverse <= upperInverse,
+              `expected P^-1(${firstProbability}, ${shape}) <= P^-1(${secondProbability}, ${shape})`,
             );
           },
         ),
@@ -214,10 +346,13 @@ describe('numerical properties', () => {
   describe('invChiSquareCDF', () => {
     it('matches the exponential quantile for two degrees of freedom', () => {
       fc.assert(
-        fc.property(probabilityArbitrary, (probability) => {
+        fc.property(centralProbabilityArbitrary, (probability) => {
           const expected = -2 * Math.log1p(-probability);
 
-          assertClose(invChiSquareCDF(probability, 2), expected, 1e-9);
+          assertClose(invChiSquareCDF(probability, 2), expected, {
+            absoluteTolerance: 1e-9,
+            relativeTolerance: 1e-12,
+          });
         }),
         { numRuns: 200 },
       );
@@ -230,8 +365,14 @@ describe('numerical properties', () => {
         fc.property(fc.double({ min: 0, max: 100, noNaN: true }), (value) => {
           const expectedSurvival = Math.exp(-value / 2);
 
-          assertClose(chiSquareCDF(value, 2), 1 - expectedSurvival, 1e-9);
-          assertClose(chiSquareSurvival(value, 2), expectedSurvival, 1e-9);
+          assertClose(chiSquareCDF(value, 2), 1 - expectedSurvival, {
+            absoluteTolerance: 5e-15,
+            relativeTolerance: 5e-15,
+          });
+          assertClose(chiSquareSurvival(value, 2), expectedSurvival, {
+            absoluteTolerance: 0,
+            relativeTolerance: 1e-13,
+          });
         }),
         { numRuns: 200 },
       );
@@ -268,16 +409,45 @@ describe('numerical properties', () => {
 
             assert.ok(
               chiSquareCDF(lowerValue, degreesOfFreedom) <=
-                chiSquareCDF(upperValue, degreesOfFreedom) + 1e-12,
+                chiSquareCDF(upperValue, degreesOfFreedom),
             );
             assert.ok(
-              chiSquareSurvival(lowerValue, degreesOfFreedom) + 1e-12 >=
+              chiSquareSurvival(lowerValue, degreesOfFreedom) >=
                 chiSquareSurvival(upperValue, degreesOfFreedom),
             );
           },
         ),
         { numRuns: 200 },
       );
+    });
+
+    it('is monotonic in degrees of freedom', () => {
+      const degreesOfFreedomValues = [0.1, 0.5, 1, 2, 5, 10, 100, 10_000];
+
+      for (const value of [0.1, 1, 10, 100]) {
+        for (let index = 1; index < degreesOfFreedomValues.length; index++) {
+          const lowerDegrees = degreesOfFreedomValues[index - 1]!;
+          const upperDegrees = degreesOfFreedomValues[index]!;
+
+          assert.ok(
+            chiSquareCDF(value, lowerDegrees) >=
+              chiSquareCDF(value, upperDegrees),
+          );
+          assert.ok(
+            chiSquareSurvival(value, lowerDegrees) <=
+              chiSquareSurvival(value, upperDegrees),
+          );
+        }
+      }
+
+      for (const probability of [0.01, 0.5, 0.99]) {
+        for (let index = 1; index < degreesOfFreedomValues.length; index++) {
+          assert.ok(
+            invChiSquareCDF(probability, degreesOfFreedomValues[index - 1]!) <=
+              invChiSquareCDF(probability, degreesOfFreedomValues[index]!),
+          );
+        }
+      }
     });
   });
 });

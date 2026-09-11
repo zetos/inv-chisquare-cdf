@@ -33,8 +33,14 @@ describe('chi-square distribution', () => {
     const lower = chiSquareCDF(value, degreesOfFreedom);
     const upper = chiSquareSurvival(value, degreesOfFreedom);
 
-    assert.ok(lower > 0.5 && lower < 0.50001);
-    assert.ok(upper < 0.5 && upper > 0.49999);
+    assertClose(lower, 0.5000013298076014, {
+      absoluteTolerance: 1e-10,
+      relativeTolerance: 0,
+    });
+    assertClose(upper, 0.4999986701923986, {
+      absoluteTolerance: 1e-10,
+      relativeTolerance: 0,
+    });
     assertClose(lower + upper, 1);
   });
 

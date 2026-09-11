@@ -11,12 +11,41 @@ describe('regLowGamma', () => {
     assert.strictEqual(regLowGamma(5, 0), 0);
     assertClose(regUpperGamma(5, 5), 0.4404932850652124);
     assertClose(regUpperGamma(0.1, 1), 0.02412734372632778);
-    assertClose(regUpperGamma(1e-15, 0.5), 5.597735947761609e-16);
+    assertClose(regUpperGamma(1e-15, 0.5), 5.597735947761609e-16, {
+      absoluteTolerance: 0,
+      relativeTolerance: 1e-12,
+    });
     assertClose(regUpperGamma(1e-12, 1e-18) / 4.086931600899129e-11, 1);
     assert.strictEqual(regUpperGamma(5, 0), 1);
     assert.strictEqual(regUpperGamma(5, Infinity), 0);
     assert.strictEqual(regLowGamma(5, Infinity), 1);
-    assertClose(regLowGamma(2e6, 2e6), 0.5000940315975192, 2e-9);
+    assertClose(regLowGamma(2e6, 2e6), 0.5000940315975192, {
+      absoluteTolerance: 1e-9,
+      relativeTolerance: 0,
+    });
+  });
+
+  it('matches independent references in each numerical region', () => {
+    assertClose(regLowGamma(10_000, 10_000.99999999), 0.5053189319223275, {
+      absoluteTolerance: 2e-10,
+      relativeTolerance: 0,
+    });
+    assertClose(regLowGamma(1e6, 1_000_001.00000001), 0.5005319227460616, {
+      absoluteTolerance: 2e-9,
+      relativeTolerance: 0,
+    });
+    assertClose(regLowGamma(2_000_001, 2_000_001), 0.5000940315740112, {
+      absoluteTolerance: 1e-9,
+      relativeTolerance: 0,
+    });
+    assertClose(regUpperGamma(0.1, 0.1), 0.17244824041413334, {
+      absoluteTolerance: 1e-12,
+      relativeTolerance: 1e-8,
+    });
+    assertClose(regUpperGamma(1e-6, 1), 2.193841588705015e-7, {
+      absoluteTolerance: 0,
+      relativeTolerance: 1e-8,
+    });
   });
 
   it('rejects invalid inputs', () => {

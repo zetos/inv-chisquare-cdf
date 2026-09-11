@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import fc from 'fast-check';
+
 import { normalVarianceConfidenceInterval } from '../src/normalVarianceConfidenceInterval.js';
 import { assertClose } from './assertClose.js';
 
@@ -8,8 +10,8 @@ describe('normalVarianceConfidenceInterval', () => {
   it('returns a reference confidence interval for population variance', () => {
     const interval = normalVarianceConfidenceInterval(4, 20, 0.95);
 
-    assertClose(interval.lower, 2.313382559472031, 1e-9);
-    assertClose(interval.upper, 8.533078016943891, 1e-9);
+    assertClose(interval.lower, 2.313382559472031);
+    assertClose(interval.upper, 8.533078016943891);
   });
 
   it('defaults to a 95% confidence level', () => {
@@ -41,6 +43,35 @@ describe('normalVarianceConfidenceInterval', () => {
 
     assert.ok(wide.lower < narrow.lower);
     assert.ok(wide.upper > narrow.upper);
+  });
+
+  it('matches the closed form for a sample size of three', () => {
+    fc.assert(
+      fc.property(
+        fc.double({ min: 1e-6, max: 1e6, noNaN: true }),
+        fc.double({ min: 1e-6, max: 1 - 1e-4, noNaN: true }),
+        (sampleVariance, confidenceLevel) => {
+          const alpha = 1 - confidenceLevel;
+          const interval = normalVarianceConfidenceInterval(
+            sampleVariance,
+            3,
+            confidenceLevel,
+          );
+          const expectedLower = sampleVariance / -Math.log(alpha / 2);
+          const expectedUpper = sampleVariance / -Math.log1p(-alpha / 2);
+
+          assertClose(interval.lower, expectedLower, {
+            absoluteTolerance: 1e-10,
+            relativeTolerance: 5e-12,
+          });
+          assertClose(interval.upper, expectedUpper, {
+            absoluteTolerance: 1e-10,
+            relativeTolerance: 5e-12,
+          });
+        },
+      ),
+      { numRuns: 200 },
+    );
   });
 
   it('rejects invalid sample variances', () => {
