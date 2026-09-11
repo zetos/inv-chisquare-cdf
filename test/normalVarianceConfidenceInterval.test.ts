@@ -29,14 +29,6 @@ describe('normalVarianceConfidenceInterval', () => {
     });
   });
 
-  it('scales linearly with sample variance', () => {
-    const first = normalVarianceConfidenceInterval(4, 20);
-    const second = normalVarianceConfidenceInterval(12, 20);
-
-    assertClose(second.lower, 3 * first.lower);
-    assertClose(second.upper, 3 * first.upper);
-  });
-
   it('widens as the confidence level increases', () => {
     const narrow = normalVarianceConfidenceInterval(4, 20, 0.9);
     const wide = normalVarianceConfidenceInterval(4, 20, 0.99);
@@ -57,17 +49,19 @@ describe('normalVarianceConfidenceInterval', () => {
             3,
             confidenceLevel,
           );
-          const expectedLower = sampleVariance / -Math.log(alpha / 2);
-          const expectedUpper = sampleVariance / -Math.log1p(-alpha / 2);
+          const expectedLowerCoefficient = 1 / -Math.log(alpha / 2);
+          const expectedUpperCoefficient = 1 / -Math.log1p(-alpha / 2);
 
-          assertClose(interval.lower, expectedLower, {
-            absoluteTolerance: 1e-10,
-            relativeTolerance: 5e-12,
-          });
-          assertClose(interval.upper, expectedUpper, {
-            absoluteTolerance: 1e-10,
-            relativeTolerance: 5e-12,
-          });
+          assertClose(
+            interval.lower / sampleVariance,
+            expectedLowerCoefficient,
+            { absoluteTolerance: 0, relativeTolerance: 5e-12 },
+          );
+          assertClose(
+            interval.upper / sampleVariance,
+            expectedUpperCoefficient,
+            { absoluteTolerance: 0, relativeTolerance: 5e-12 },
+          );
         },
       ),
       { numRuns: 200 },

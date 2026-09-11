@@ -25,7 +25,7 @@ describe('regLowGamma', () => {
     });
   });
 
-  it('matches independent references in each numerical region', () => {
+  it('matches independent references at observed worst cases', () => {
     assertClose(regLowGamma(10_000, 10_000.99999999), 0.5053189319223275, {
       absoluteTolerance: 2e-10,
       relativeTolerance: 0,
@@ -40,12 +40,36 @@ describe('regLowGamma', () => {
     });
     assertClose(regUpperGamma(0.1, 0.1), 0.17244824041413334, {
       absoluteTolerance: 1e-12,
-      relativeTolerance: 1e-8,
+      relativeTolerance: 0,
     });
     assertClose(regUpperGamma(1e-6, 1), 2.193841588705015e-7, {
       absoluteTolerance: 0,
       relativeTolerance: 1e-8,
     });
+  });
+
+  it('retains high precision through the large-shape transition zone', () => {
+    for (const [a, x, expected, absoluteTolerance] of [
+      [20, 21, 0.6157372277356585, 1e-11],
+      [100, 101, 0.5528962934345113, 1e-12],
+      [1000, 1001, 0.5168114529297863, 1e-12],
+      [10_000, 10_001, 0.5053189319622187, 1e-12],
+      [100_000, 100_001, 0.5016820789097073, 1e-12],
+      [1e6, 1_000_001, 0.5005319227420676, 1e-12],
+    ] as const) {
+      assertClose(regLowGamma(a, x), expected, { absoluteTolerance });
+      assertClose(regUpperGamma(a, x), 1 - expected, {
+        absoluteTolerance,
+      });
+    }
+
+    assert.strictEqual(regLowGamma(2000, 2780), 1);
+    assertClose(regUpperGamma(2000, 2780), 4.337627635862428e-55, {
+      absoluteTolerance: 0,
+      relativeTolerance: 5e-10,
+    });
+    assert.strictEqual(regLowGamma(100_000, 139_000), 1);
+    assert.strictEqual(regUpperGamma(100_000, 139_000), 0);
   });
 
   it('rejects invalid inputs', () => {
