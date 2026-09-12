@@ -10,7 +10,7 @@ The name `invChiSquareCDF` means **inverse of the chi-square CDF**: it computes 
 npm install inv-chisquare-cdf
 ```
 
-Version 2 requires Node.js 24 or later and is ESM-only. CommonJS `require()` is not supported.
+Version 2 is ESM-only. CommonJS `require()` is not supported. The published package uses standard JavaScript and can run in ESM-capable runtimes such as Node.js and Bun.
 
 ## Quick Start
 
