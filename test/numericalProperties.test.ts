@@ -396,16 +396,11 @@ describe('numerical properties', () => {
     });
 
     it('is monotonic in the evaluated value', () => {
-      const valueArbitrary = fc.double({ min: 0, max: 200, noNaN: true });
-
       fc.assert(
         fc.property(
-          fc.tuple(valueArbitrary, valueArbitrary),
+          orderedValuePairArbitrary,
           positiveShapeArbitrary,
-          ([firstValue, secondValue], degreesOfFreedom) => {
-            const lowerValue = Math.min(firstValue, secondValue);
-            const upperValue = Math.max(firstValue, secondValue);
-
+          ([lowerValue, upperValue], degreesOfFreedom) => {
             assert.ok(
               chiSquareCDF(lowerValue, degreesOfFreedom) <=
                 chiSquareCDF(upperValue, degreesOfFreedom),
