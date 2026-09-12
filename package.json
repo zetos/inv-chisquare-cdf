@@ -34,14 +34,20 @@
     "url": "git+https://github.com/zetos/inv-chisquare-cdf.git"
   },
   "keywords": [
-    "inverse",
-    "chi",
-    "squared",
+    "chi-square",
+    "chi-squared",
+    "chi-square-distribution",
+    "chi-square-cdf",
     "cdf",
+    "quantile",
+    "inverse-cdf",
+    "statistics",
+    "probability",
+    "goodness-of-fit",
+    "confidence-interval",
+    "gamma-function",
     "mathematics",
-    "lanczos",
-    "approximation",
-    "gamma"
+    "typescript"
   ],
   "author": "Zetos Lima <cesar_manoel@hotmail.com>",
   "license": "MIT",
