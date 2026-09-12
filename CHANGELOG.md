@@ -1,5 +1,11 @@
 # inv-chisquare-cdf
 
+## 2.2.1
+
+### Patch Changes
+
+- [#43](https://github.com/zetos/inv-chisquare-cdf/pull/43) [`8600484`](https://github.com/zetos/inv-chisquare-cdf/commit/8600484680844872bdbd0766c1c30975b1793b41) Thanks [@zetos](https://github.com/zetos)! - Improve incomplete gamma precision for large shapes near the transition zone.
+
 ## 2.2.0
 
 ### Minor Changes
