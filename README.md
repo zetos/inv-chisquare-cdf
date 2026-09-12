@@ -2,7 +2,7 @@
 
 **inv-chisquare-cdf** is a small TypeScript library for working with the chi-square distribution. It provides cumulative, survival, and inverse distribution functions, plus helpers for Pearson goodness-of-fit tests and normal-population variance intervals.
 
-The inverse CDF answers questions such as: "What chi-square value has 95% of the distribution below it?" This is different from the [inverse-chi-squared distribution](https://en.wikipedia.org/wiki/Inverse-chi-squared_distribution), which is a separate probability distribution.
+The name `invChiSquareCDF` means **inverse of the chi-square CDF**: it computes the quantile function, answering questions such as: "What chi-square value has 95% of the distribution below it?" It does **not** refer to the [inverse-chi-squared distribution](https://en.wikipedia.org/wiki/Inverse-chi-squared_distribution), which is a separate probability distribution for the reciprocal of a chi-squared random variable.
 
 ## Install
 
@@ -127,6 +127,8 @@ const result = chiSquareGoodnessOfFit(
 ### `invChiSquareCDF(probability, degreeOfFreedom)`
 
 Returns the non-negative value `x` for which `P(X <= x) = probability`. `probability` must be strictly between zero and one, and `degreeOfFreedom` must be greater than zero.
+
+Here, "inverse chi-square CDF" means the inverse **of the** chi-square CDF (also called the quantile or percent-point function), not the CDF of the [inverse-chi-squared distribution](https://en.wikipedia.org/wiki/Inverse-chi-squared_distribution).
 
 ### `normalVarianceConfidenceInterval(sampleVariance, sampleSize, confidenceLevel?)`
 
