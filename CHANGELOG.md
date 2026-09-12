@@ -1,5 +1,11 @@
 # inv-chisquare-cdf
 
+## 2.2.2
+
+### Patch Changes
+
+- [`50f4aef`](https://github.com/zetos/inv-chisquare-cdf/commit/50f4aefb2797afe12bb507db47b788d1b1017611) Thanks [@zetos](https://github.com/zetos)! - Remove the Node.js engine restriction so ESM-capable runtimes such as Bun can install and run the package. Improve npm package search keywords.
+
 ## 2.2.1
 
 ### Patch Changes
